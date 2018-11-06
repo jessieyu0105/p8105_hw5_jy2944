@@ -1,0 +1,13 @@
+---
+title: "p8105_hw5_jy2944"
+author: "Jie Yu"
+date: "11/6/2018"
+output: github_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+
+library(tidyverse)
+```
+
