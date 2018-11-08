@@ -18,11 +18,11 @@ library(tidyverse)
 
 ### Import and tidy data
 
-```{r p1_import_tidy, warning = FALSE}
+```{r p1_import_tidy}
 # Start with a dataframe containing all file names: `list.files()`
-study_df = tibble(file_names = list.files(path = "./data")) %>% 
+study_df = tibble(file_names = list.files(path = "./data/problem1_data")) %>% 
   # Use `map()` to iterate over file names and read in data for each subject, and save the results in a new variable `data`
-  mutate(data = map(.x = str_c("./data/", file_names), 
+  mutate(data = map(.x = str_c("./data/problem1_data/", file_names), 
                     ~ read.csv(.x))) %>% 
   unnest() %>%
   # Begin Tidy
@@ -40,3 +40,13 @@ study_df = tibble(file_names = list.files(path = "./data")) %>%
     week = as.integer(week)
   )
 ```
+
+### Spaghetti plot
+
+```{r p1_spaghetti_plot}
+study_df %>% 
+  ggplot(aes(x = week, y = subject_data, color = group, group = subject_id)) +
+  geom_point(alpha = 0.5) +
+  geom_line()
+```
+
