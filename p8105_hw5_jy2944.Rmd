@@ -11,6 +11,8 @@ output:
 knitr::opts_chunk$set(collapse = TRUE)
 
 library(tidyverse)
+
+theme_set(theme_bw() + theme(legend.position = "bottom"))
 ```
 
 
@@ -36,8 +38,9 @@ study_df = tibble(file_names = list.files(path = "./data/problem1_data")) %>%
   mutate(
     # remove str "week_" in variable `week`
     week = str_replace(week, "week_", ""),
-    subject_id = as.integer(subject_id),
-    week = as.integer(week)
+    subject_id = factor(subject_id),
+    week = as.integer(week),
+    group = factor(group)
   )
 ```
 
@@ -45,8 +48,19 @@ study_df = tibble(file_names = list.files(path = "./data/problem1_data")) %>%
 
 ```{r p1_spaghetti_plot}
 study_df %>% 
-  ggplot(aes(x = week, y = subject_data, color = group, group = subject_id)) +
+  mutate(group = recode(group, "con" = "control", "exp" = "experimental")) %>%
+  ggplot(aes(x = week, y = subject_data, color = subject_id, group = subject_id)) +
   geom_point(alpha = 0.5) +
-  geom_line()
+  geom_line() +
+  facet_grid(. ~group) +
+  labs(
+    title = "Observations on each subject over time by control and experimental group",
+    x = "Week",
+    y = "Observation value",
+    color = "Subject ID"
+  ) 
 ```
+
+Comments:
+
 
