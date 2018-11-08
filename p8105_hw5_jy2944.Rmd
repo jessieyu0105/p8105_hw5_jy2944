@@ -2,7 +2,9 @@
 title: "p8105_hw5_jy2944"
 author: "Jie Yu"
 date: "11/6/2018"
-output: github_document
+output: 
+  github_document:
+    toc: TRUE
 ---
 
 ```{r setup, include = FALSE}
@@ -11,3 +13,30 @@ knitr::opts_chunk$set(collapse = TRUE)
 library(tidyverse)
 ```
 
+
+# Problem 1
+
+### Import and tidy data
+
+```{r p1_import_tidy, warning = FALSE}
+# Start with a dataframe containing all file names: `list.files()`
+study_df = tibble(file_names = list.files(path = "./data")) %>% 
+  # Use `map()` to iterate over file names and read in data for each subject, and save the results in a new variable `data`
+  mutate(data = map(.x = str_c("./data/", file_names), 
+                    ~ read.csv(.x))) %>% 
+  unnest() %>%
+  # Begin Tidy
+  janitor::clean_names() %>% 
+  # remove str ".csv" in variable `file_names`
+  mutate(file_names = str_replace(file_names, ".csv", "")) %>% 
+  # manipulate file names to include study arm and subject ID
+  separate(file_names, into = c("group", "subject_id"), sep = "_") %>% 
+  # gather weekly observations
+  gather(key = "week", value = "subject_data", week_1:week_8) %>% 
+  mutate(
+    # remove str "week_" in variable `week`
+    week = str_replace(week, "week_", ""),
+    subject_id = as.integer(subject_id),
+    week = as.integer(week)
+  )
+```
