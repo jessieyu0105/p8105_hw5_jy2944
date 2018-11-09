@@ -102,7 +102,7 @@ head(homicide_summary, 10)
 
 For the city of Baltimore, MD, we use the `prop.test` function to estimate the proportion of homicides that are unsolved.
 
-```{r p2_baltimore_test}
+```{r p2_baltimore_prop_test}
 # filter the city "Baltimore, MD"
 baltimore = homicide_summary %>% 
   filter(city_state == "Baltimore, MD")
@@ -120,4 +120,39 @@ baltimore_prop %>%
   knitr::kable(digits = 3)
 ```
 
+Now we run `prop.test` for each of the cities.  
+
+```{r p2_all_prop_test, warning = FALSE}
+# Establish a function for prop_test, turn the model object into a tidy tibble, and pull the estimated proportion and CI
+prop_test = function(x, n){
+  prop.test(x, n) %>% 
+    broom::tidy() %>% 
+    select(estimate, conf.low, conf.high)
+}
+
+# run the prop_test function for all cities
+all_cities_prop = homicide_summary %>% 
+  # map2(): use it when your function has 2 arguments
+  mutate(prop_city = map2(.x = unsolved_cases, .y = total_cases, 
+                          ~prop_test(.x, .y))) %>% 
+  unnest() %>% 
+  select(-total_cases, -unsolved_cases)
+
+head(all_cities_prop, 10)
+```
+
+### Plot showing estimated proportions and CIs
+
+```{r p2_plot}
+all_cities_prop %>% 
+  mutate(city_state = forcats::fct_reorder(city_state, estimate, .desc = TRUE)) %>% 
+  ggplot(aes(x = city_state, y = estimate)) +
+  geom_point() +
+  geom_errorbar(aes(x = city_state, ymin = conf.low, ymax = conf.high)) +
+  labs(
+    title = "Estimated proportions and CIs of the unsolved homicides in each city", 
+    x = "City", 
+    y = "Estimate proportion") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```
 
