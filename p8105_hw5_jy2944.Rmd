@@ -66,15 +66,37 @@ Comments:
 
 # Problem 2
 
-```{r message = FALSE}
+### Import data
+```{r p2_import_data, message = FALSE}
 # Download the dataset from a Github repo: the file is too big to show on Github
 homicide_data = GET("https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv") %>% 
   content("raw") %>%
   read_csv()
-
-str(homicide_data)
 ```
 
+### Description of raw data
+
 This raw data is gathered by the _Washington Post_, which records homicide cases in large U.S cities. The dataset is consisted of `r nrow(homicide_data)` observations and `r ncol(homicide_data)` variables. The variables contain information related to the reported date of each case, personal information of each victim (name, race, age, sex), information of the incident site (city, state, latitude, longitude), and the status of each case (`disposition`).
+
+
+### Summary number of cases within cities
+
+Then, We create a new variable `city_state` and summarize within cities to obtain the total number of homicide cases and number of unsolved homicide cases.
+
+```{r p2_summary}
+homicide_summary = homicide_data %>% 
+  # create a `city_state` variable (e.g. “Baltimore, MD”) 
+  mutate(city_state = str_c(city, ", ", state)) %>%
+  group_by(city_state) %>% 
+  summarise(
+    # summarize total number of homicides
+    total_cases = n(),
+    # summarize number of unsolved homicides
+    unsolved_cases = sum(disposition %in% c("Closed without arrest", "Open/No arrest"))
+    )
+
+head(homicide_summary, 10)
+```
+
 
 
