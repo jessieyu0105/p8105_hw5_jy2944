@@ -19,7 +19,13 @@ theme_set(theme_bw() + theme(legend.position = "bottom"))
 
 # Problem 1
 
+The problem focuses on a longitudinal study that included an experimental group and a control group. 
+
 ### Import and tidy data
+
+We use `purrr::map` to read the data from each csv and combine them into one dataset. 
+
+After tidying, each row in the resulting dataset represents the information (group assignment, id, observation value) for each subject in each week (8 weeks in total).
 
 ```{r p1_import_tidy}
 # Start with a dataframe containing all file names: `list.files()`
@@ -35,7 +41,7 @@ study_df = tibble(file_names = list.files(path = "./data/problem1_data")) %>%
   # manipulate file names to include study arm and subject ID
   separate(file_names, into = c("group", "subject_id"), sep = "_") %>% 
   # gather weekly observations
-  gather(key = "week", value = "subject_data", week_1:week_8) %>% 
+  gather(key = "week", value = "observation_value", week_1:week_8) %>% 
   mutate(
     # remove str "week_" in variable `week`
     week = str_replace(week, "week_", ""),
@@ -45,6 +51,7 @@ study_df = tibble(file_names = list.files(path = "./data/problem1_data")) %>%
   )
 ```
 
+
 ### Spaghetti plot
 
 Next we make a spaghetti plot to show observations on each subject over time.
@@ -53,7 +60,7 @@ Next we make a spaghetti plot to show observations on each subject over time.
 study_df %>% 
   mutate(group = recode(group, "con" = "control", "exp" = "experimental")) %>%
   group_by(group, subject_id) %>% 
-  ggplot(aes(x = week, y = subject_data, color = group, type = subject_id)) + 
+  ggplot(aes(x = week, y = observation_value , color = group, type = subject_id)) + 
   geom_point() +
   geom_line() +
   labs(
