@@ -47,22 +47,23 @@ study_df = tibble(file_names = list.files(path = "./data/problem1_data")) %>%
 
 ### Spaghetti plot
 
+Next we make a spaghetti plot to show observations on each subject over time.
+
 ```{r p1_spaghetti_plot}
 study_df %>% 
   mutate(group = recode(group, "con" = "control", "exp" = "experimental")) %>%
-  ggplot(aes(x = week, y = subject_data, color = subject_id, group = subject_id)) +
-  geom_point(alpha = 0.5) +
+  group_by(group, subject_id) %>% 
+  ggplot(aes(x = week, y = subject_data, color = group, type = subject_id)) + 
+  geom_point() +
   geom_line() +
-  facet_grid(. ~group) +
   labs(
     title = "Observations on each subject over time by control and experimental group",
     x = "Week",
-    y = "Observation value",
-    color = "Subject ID"
+    y = "Observation value"
   ) 
 ```
 
-Comments:
+The experimental group appears to have an upward trend in observation value over weeks, while the control group appears to have a relatively steady or slight downward trend in observation value over weeks. In the overall aspect, the participants in the experimental group tend to have higher observation value than those in the control group.
 
 # Problem 2
 
