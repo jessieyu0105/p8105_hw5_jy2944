@@ -143,7 +143,7 @@ head(all_cities_prop, 10)
 
 ### Plot showing estimated proportions and CIs
 
-```{r p2_plot}
+```{r p2_plot, fig.width = 10, fig.height = 6}
 all_cities_prop %>% 
   mutate(city_state = forcats::fct_reorder(city_state, estimate, .desc = TRUE)) %>% 
   ggplot(aes(x = city_state, y = estimate)) +
