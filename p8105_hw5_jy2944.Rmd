@@ -98,5 +98,26 @@ homicide_summary = homicide_data %>%
 head(homicide_summary, 10)
 ```
 
+### Proportion test
+
+For the city of Baltimore, MD, we use the `prop.test` function to estimate the proportion of homicides that are unsolved.
+
+```{r p2_baltimore_test}
+# filter the city "Baltimore, MD"
+baltimore = homicide_summary %>% 
+  filter(city_state == "Baltimore, MD")
+
+# use `prop.test` to estimate the proportion of homicides that are unsolved
+# save the output of prop.test as an R object
+baltimore_prop = prop.test(baltimore$unsolved_cases, baltimore$total_cases)
+
+
+baltimore_prop %>% 
+  # turn a model object into a tidy tibble
+  broom::tidy() %>% 
+  # pull the estimated proportion and CI from the resulting tidy dataframe
+  select(estimate, conf.low, conf.high) %>% 
+  knitr::kable(digits = 3)
+```
 
 
