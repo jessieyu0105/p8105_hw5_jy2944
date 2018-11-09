@@ -157,7 +157,7 @@ all_cities_prop %>%
   # make the plot
   ggplot(aes(x = city_state, y = estimate)) +
   # points represent the proportions for each city
-  geom_point() +
+  geom_point(color = "red") +
   # geom_errorbar(): add error bars based on the upper and lower limits
   geom_errorbar(aes(x = city_state, ymin = conf.low, ymax = conf.high)) +
   labs(
