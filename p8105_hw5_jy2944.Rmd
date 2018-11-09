@@ -74,7 +74,8 @@ The experimental group appears to have an upward trend in observation value over
 
 # Problem 2
 
-### Import data
+### Import and describe the raw data
+
 ```{r p2_import_data, message = FALSE}
 # Download the dataset from a Github repo: the file is too big to show on Github
 homicide_data = GET("https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv") %>% 
@@ -82,12 +83,10 @@ homicide_data = GET("https://raw.githubusercontent.com/washingtonpost/data-homic
   read_csv()
 ```
 
-### Description of raw data
-
 This raw data is gathered by the _Washington Post_, which records homicide cases in large U.S cities. The dataset is consisted of `r nrow(homicide_data)` observations and `r ncol(homicide_data)` variables. The variables contain information related to the reported date of each case, personal information of each victim (name, race, age, sex), information of the incident site (city, state, latitude, longitude), and the status of each case (`disposition`).
 
 
-### Summary number of cases within cities
+### Summarize number of cases within cities
 
 Then, We create a new variable `city_state` and summarize within cities to obtain the total number of homicide cases and number of unsolved homicide cases.
 
@@ -108,7 +107,7 @@ head(homicide_summary, 10)
 
 ### Proportion test
 
-For the city of Baltimore, MD, we use the `prop.test` function to estimate the proportion of homicides that are unsolved.
+For the city of Baltimore, MD, we use the `prop.test` function to estimate the proportion of homicides that are unsolved. At the end, we can get the estimated proportion and confidence intervals of unsolved homicide cases in Baltimore.
 
 ```{r p2_baltimore_prop_test}
 # filter the city "Baltimore, MD"
@@ -128,7 +127,7 @@ baltimore_prop %>%
   knitr::kable(digits = 3)
 ```
 
-Now we run `prop.test` for each of the cities.  
+Now we run `prop.test` for each city in our dataset, and get the estimated proportion and confidence interval of unsolved homicide cases for each city.
 
 ```{r p2_all_prop_test, warning = FALSE}
 # Establish a function for prop_test, turn the model object into a tidy tibble, and pull the estimated proportion and CI
@@ -153,9 +152,13 @@ head(all_cities_prop, 10)
 
 ```{r p2_plot, fig.width = 10, fig.height = 6}
 all_cities_prop %>% 
+  # organize cities according to the proportion of unsolved homicides (in a descending order)
   mutate(city_state = forcats::fct_reorder(city_state, estimate, .desc = TRUE)) %>% 
+  # make the plot
   ggplot(aes(x = city_state, y = estimate)) +
+  # points represent the proportions for each city
   geom_point() +
+  # geom_errorbar(): add error bars based on the upper and lower limits
   geom_errorbar(aes(x = city_state, ymin = conf.low, ymax = conf.high)) +
   labs(
     title = "Estimated proportions and CIs of the unsolved homicides in each city", 
